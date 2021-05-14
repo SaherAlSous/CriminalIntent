@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
+import androidx.core.view.isInvisible
 import androidx.fragment.app.Fragment
 
 class CrimeFragment: Fragment() {
