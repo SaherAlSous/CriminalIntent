@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
-import androidx.core.view.isInvisible
 import androidx.fragment.app.Fragment
 
 class CrimeFragment: Fragment() {
@@ -66,7 +65,7 @@ class CrimeFragment: Fragment() {
         TextWatcher has three functions, before, on and afterTextChange, we need only one.
         we convert the text CharSequence into string to be used in the title.
 
-        At the end, we link the titlefield with the listener class using
+        At the end, we link the title field with the listener class using
         an addTextChangeListener
 
         actually setting all the listeners inside onStart/
