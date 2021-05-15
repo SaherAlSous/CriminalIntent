@@ -10,6 +10,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -21,18 +22,14 @@ class CrimeListFragment: Fragment() {
     private lateinit var crimeRecyclerView : RecyclerView
 
     //creating the adapter value that will link the Model with the View
-    private var adapter : CrimeAdapter? = null
+    private var adapter : CrimeAdapter? = CrimeAdapter(emptyList())
+    //preparing the adapter to take from livedata
 
     private val crimeListViewModel: CrimeListViewModel by lazy {
         ViewModelProvider(this).get(CrimeListViewModel::class.java)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        Log.d(TAG, "Total Crimes: ${crimeListViewModel.crimes.size}")
-    }
-
-    /*
+        /*
     We link the fragment view (fragment crime list) with the code, and define the Recycler view
     then we give the Recycler view to a layout manager to work. otherwise it will crash
     because RecyclerView does not position items on the screen itself, it delegates that job
@@ -52,15 +49,29 @@ class CrimeListFragment: Fragment() {
         crimeRecyclerView.layoutManager= LinearLayoutManager(context)
 
         //linking the data model with the adapter and View
-        updateUI()
+        //updateUI()
 
         return view
     }
-
-    private fun updateUI() {
-        val crimes = crimeListViewModel.crimes
+/*
+updating the code to take LiveData
+ */
+    private fun updateUI(crimes: List<Crime>) {
         adapter = CrimeAdapter(crimes)
         crimeRecyclerView.adapter = adapter
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        crimeListViewModel.crimeListLiveData.observe(
+            viewLifecycleOwner,
+            Observer { crimes ->
+                crimes?.let {
+                    Log.i(TAG, "Got Crimes ${crimes.size}")
+                    updateUI(crimes)
+                }
+            }
+        )
     }
 
     /*

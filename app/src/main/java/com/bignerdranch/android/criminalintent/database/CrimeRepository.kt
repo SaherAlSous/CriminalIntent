@@ -1,6 +1,7 @@
 package com.bignerdranch.android.criminalintent.database
 
 import android.content.Context
+import androidx.lifecycle.LiveData
 import androidx.room.Room
 import com.bignerdranch.android.criminalintent.Crime
 import java.util.*
@@ -39,8 +40,10 @@ class CrimeRepository private constructor(context: Context){
     for each function in DAO we create a function here in Repository to link them
      */
 
-    fun getCrimes(): List<Crime> = crimeDao.getCrimes()
-    fun getCrime(id: UUID): Crime? = crimeDao.getCrime(id)
+    fun getCrimes(): LiveData<List<Crime>> = crimeDao.getCrimes()
+    fun getCrime(id: UUID): LiveData<Crime?> = crimeDao.getCrime(id)
+
+    /* adding livedata above after DAO*/
 
     companion object{
         private var INSTANCE: CrimeRepository? = null
