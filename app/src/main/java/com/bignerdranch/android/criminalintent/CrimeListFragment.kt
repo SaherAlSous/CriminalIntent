@@ -1,5 +1,6 @@
 package com.bignerdranch.android.criminalintent
 
+import android.content.Context
 import android.os.Bundle
 import android.text.format.DateFormat
 import android.util.Log
@@ -8,16 +9,28 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import java.util.*
+
 
 private const val TAG = "CrimeListFragment"
 
 class CrimeListFragment: Fragment() {
+
+    /*
+    Required interface for hosting activities.
+    Changing the fragment is only for the Hosting Activity to do,
+    not the fragment business. that is why we callback to the hosting activity.
+     */
+    interface Callbacks {
+        fun onCrimeSelected(crimeId : UUID)
+    }
+
+    private var callbacks: Callbacks? = null
 
     private lateinit var crimeRecyclerView : RecyclerView
 
@@ -27,6 +40,18 @@ class CrimeListFragment: Fragment() {
 
     private val crimeListViewModel: CrimeListViewModel by lazy {
         ViewModelProvider(this).get(CrimeListViewModel::class.java)
+    }
+
+    /*
+    onAttach for the fragment, once it is created and attached to the activity.
+     */
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        callbacks = context as Callbacks?
+    /* The Context object passed here is Activity Instance that is holding the fragment.
+    Activity is sub class to context.
+     */
+
     }
 
         /*
@@ -73,6 +98,12 @@ updating the code to take LiveData
             }
         )
     }
+
+    override fun onDetach() {
+        super.onDetach()
+        callbacks = null
+    }
+
 
     /*
     RecyclerView expects an item view to be wrapped in an instance of ViewHolder.
@@ -122,7 +153,11 @@ updating the code to take LiveData
          */
 
         override fun onClick(v: View?) {
-            Toast.makeText(context, "${crime.title} was pressed", Toast.LENGTH_SHORT).show()
+            /*
+            once the crime is clicked in the view, we send a callback to hosting activity
+            with the id of the crime clicked.
+             */
+            callbacks?.onCrimeSelected(crime.id)
         }
     }
     /*
