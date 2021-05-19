@@ -8,4 +8,5 @@
     <string name="crimedate">Crime date</string>
     <string name="crimetitle">Crime title</string>
     <string name="handcuffs">handcuffs</string>
+    <string name="new_crime">New Crime</string>
 </resources>

@@ -20,4 +20,8 @@ val crimes = mutableListOf<Crime>()
     private val crimeRepository = CrimeRepository.get()
     val crimeListLiveData = crimeRepository.getCrimes()
 
+    //allow app to add crimes into db
+    fun addCrime(crime: Crime){
+        crimeRepository.addCrime(crime)
+    }
 }
