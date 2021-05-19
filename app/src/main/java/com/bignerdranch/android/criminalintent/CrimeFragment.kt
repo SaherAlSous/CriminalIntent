@@ -1,8 +1,15 @@
 package com.bignerdranch.android.criminalintent
 
+import android.app.Activity
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.content.pm.ResolveInfo
+import android.net.Uri
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.text.Editable
 import android.text.TextWatcher
+import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +25,8 @@ import androidx.lifecycle.Observer
 private const val ARG_CRIME_ID = "crime_id"
 private const val DIALOG_DATE = "DialogDate"
 private const val REQUEST_CODE = 0
+private const val Date_Format = "EEE, MMM, dd"
+private const val REQUEST_CONTACT = 1
 
 class CrimeFragment: Fragment() , DatePickerFragment.Callbacks {
     private lateinit var crime: Crime
@@ -25,6 +34,8 @@ class CrimeFragment: Fragment() , DatePickerFragment.Callbacks {
     private lateinit var titleField: EditText
     private lateinit var dateButton: Button
     private lateinit var solvedCheckBox: CheckBox
+    private lateinit var reportButton: Button
+    private lateinit var suspectButton: Button
     /*
     Hooking the crimedetailviewmodel with crimefragment to use crimeId
      */
@@ -65,6 +76,8 @@ class CrimeFragment: Fragment() , DatePickerFragment.Callbacks {
         titleField = view.findViewById(R.id.crime_title) as EditText
         dateButton = view.findViewById(R.id.crime_date) as Button
         solvedCheckBox = view.findViewById(R.id.crime_solved) as CheckBox
+        reportButton = view.findViewById(R.id.crime_report) as Button
+        suspectButton = view.findViewById(R.id.crime_suspect) as Button
 
        /* dateButton.apply {
             text = crime.date.toString()
@@ -147,6 +160,42 @@ class CrimeFragment: Fragment() , DatePickerFragment.Callbacks {
                 show(this@CrimeFragment.getParentFragmentManager(), DIALOG_DATE)
             }
         }
+
+        /*
+        Creating an implicit intent to send the report as text, with subject and body. p.298+
+         */
+        reportButton.setOnClickListener {
+            Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_TEXT, getCrimeReport())
+                putExtra(Intent.EXTRA_SUBJECT, getString(R.string.crime_report_subject))
+            }.also { intent ->
+                val chooseIntent = Intent.createChooser(intent,getString(R.string.send_report))
+                startActivity(chooseIntent)
+            }
+        }
+
+        /*
+        Creating an implicit request to pick up a contact from the phone contacts. p 302
+         */
+        suspectButton.apply{
+            val pickContactIntent = Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI)
+            setOnClickListener {
+                startActivityForResult(pickContactIntent, REQUEST_CONTACT)
+            }
+            /*
+     in case there is no contacts app. we let the device(package manager) to bring a list of
+     apps that has similar work -> checking for responding activities p. 307
+      */
+            val packageManager : PackageManager = requireActivity().packageManager
+            val resolvedActivity: ResolveInfo? =
+                packageManager.resolveActivity(pickContactIntent ,
+                    PackageManager.MATCH_DEFAULT_ONLY)
+
+            if (resolvedActivity==null) {
+                isEnabled = false
+            }
+        }
     }
 
     /*
@@ -155,8 +204,75 @@ class CrimeFragment: Fragment() , DatePickerFragment.Callbacks {
     private fun updateUI() {
         titleField.setText(crime.title)
         dateButton.text = crime.date.toString()
-        solvedCheckBox.isChecked = crime.isSolved
+        solvedCheckBox.apply {
+            isChecked = crime.isSolved
+            jumpDrawablesToCurrentState()
+        }
+        if (crime.suspect.isNotBlank()){
+            suspectButton.text = crime.suspect
+        }
     }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+       /*
+       getting data from contact list. p. 304+
+        */
+
+        when{
+            resultCode != Activity.RESULT_OK -> return
+
+            requestCode == REQUEST_CONTACT && data != null -> {
+                val contactURI : Uri? = data.data
+                //Specify which fields you want your query to return values for
+                val queryFields = arrayOf(ContactsContract.Contacts.DISPLAY_NAME)
+                //Perform Your Query - the ContactURI is like a "where" clause here
+                val cursor = contactURI?.let {
+                    requireActivity().contentResolver
+                        .query(it, queryFields, null, null, null)
+                }
+
+                cursor.use {
+                    //Verify Cursor contacts at least one result
+                    if (it?.count == 0) {
+                        return
+                    }
+
+                    /*
+                    Pull out the first column of the first row of data -
+                    that is your suspect name.
+                     */
+                    it?.moveToFirst()
+                    val suspect = it?.getString(0)
+                    if (suspect != null) {
+                        crime.suspect= suspect
+                    }
+                    crimeDetailViewModel.saveCrime(crime)
+                    suspectButton.text=suspect
+                }
+            }
+        }
+    }
+
+    /*
+    Creating a string message made several variables
+     */
+
+    private fun getCrimeReport() : String{
+        val solvedString = if (crime.isSolved){
+            getString(R.string.crime_report_solved)
+        } else {
+            getString(R.string.crime_report_unsolved)
+        }
+        val dateString = DateFormat.format(Date_Format, crime.date).toString()
+        var suspect = if (crime.suspect.isBlank()){
+            getString(R.string.crime_report_no_suspect)
+        }else {
+            getString(R.string.crime_report_suspect, crime.suspect)
+        }
+        return getString(R.string.crime_report, crime.title, dateString, solvedString, suspect)
+            /*returning the complete msg p. 295 */
+    }
+
 
     /*
     creating an instance for the fragment to hold the argument needed to pass the user id for this
