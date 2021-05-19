@@ -16,7 +16,10 @@ import java.util.*
 import androidx.lifecycle.Observer
 
 private const val ARG_CRIME_ID = "crime_id"
-class CrimeFragment: Fragment() {
+private const val DIALOG_DATE = "DialogDate"
+private const val REQUEST_CODE = 0
+
+class CrimeFragment: Fragment() , DatePickerFragment.Callbacks {
     private lateinit var crime: Crime
     //wiring the widgets into the fragment
     private lateinit var titleField: EditText
@@ -63,10 +66,12 @@ class CrimeFragment: Fragment() {
         dateButton = view.findViewById(R.id.crime_date) as Button
         solvedCheckBox = view.findViewById(R.id.crime_solved) as CheckBox
 
-        dateButton.apply {
+       /* dateButton.apply {
             text = crime.date.toString()
             isEnabled = false
         }
+        Using the button to date picker dialog
+        */
 
         return view
     }
@@ -132,6 +137,16 @@ class CrimeFragment: Fragment() {
                 crime.isSolved = isChecked
             }
         }
+        dateButton.setOnClickListener {
+            /* passing the crime date from this fragment to dialog fragment using instance*/
+            DatePickerFragment.newInstance(crime.date).apply {
+                setTargetFragment(this@CrimeFragment, REQUEST_CODE) // making this fragment
+                                                                            // a target fragment for
+                                                                            //the dialog to get the
+                                                                            //picked date by user
+                show(this@CrimeFragment.getParentFragmentManager(), DIALOG_DATE)
+            }
+        }
     }
 
     /*
@@ -165,5 +180,11 @@ class CrimeFragment: Fragment() {
     override fun onStop() {
         super.onStop()
         crimeDetailViewModel.saveCrime(crime)
+    }
+
+    //getting a callback from date picker dialog for picked date and updating the UI
+    override fun onDateSelected(date: Date) {
+        crime.date = date
+        updateUI()
     }
 }
