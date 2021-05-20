@@ -9,7 +9,6 @@ import android.graphics.Point
 creating a file that would read the image taken, and rescale it to fit the view area as bitmap
 image. p. 322
  */
-
 fun getScaledBitmap(path: String, activity: Activity) : Bitmap{
     val size = Point()
     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
@@ -33,7 +32,6 @@ fun getScaledBitmap(path: String, destWidth: Int, destHeight: Int): Bitmap{
     val srcHeight = options.outHeight.toFloat()
 
     //figure out how much to scale down by
-
     var inSampleSize = 1
     if(srcHeight > destHeight || srcWidth > destWidth){
         val heightScale = srcHeight / destHeight
