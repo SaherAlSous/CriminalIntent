@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.room.Room
 import com.bignerdranch.android.criminalintent.Crime
+import java.io.File
 import java.util.*
 import java.util.concurrent.Executors
 
@@ -37,6 +38,7 @@ class CrimeRepository private constructor(context: Context){
 
     private val crimeDao = database.crimeDao()
     private val executor = Executors.newSingleThreadExecutor()
+    private val filesDir = context.applicationContext.filesDir
     /*
     Adding and executor to create a thread to store the updated crime an insert a new one
     check page 257
@@ -65,6 +67,9 @@ class CrimeRepository private constructor(context: Context){
     /*
     adding an executor to update/create crime entries.
      */
+
+    //saving photos into device, p.317
+    fun getPhotoFile(crime: Crime): File = File(filesDir, crime.photoFileName)
 
     companion object{
         private var INSTANCE: CrimeRepository? = null

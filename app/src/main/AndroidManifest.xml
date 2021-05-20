@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.bignerdranch.android.criminalintent">
 
+    <uses-feature android:name="android.hardware.camera"
+        android:required="false"/>
+
     <!-- We add the CriminialIntentApplication into manifest to create an instance for
      it once the app starts, which will call the onCreate class within file. this will
      initialize CrimeRepository and it can be accessed from other components.-->
@@ -23,6 +26,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <!-- giving permission to camera app, p.316-->
+        <provider
+            android:authorities="com.bignerdranch.android.criminalintent.fileprovider"
+            android:name="androidx.core.content.FileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/files"/>
+        </provider>
+
     </application>
 
 </manifest>
