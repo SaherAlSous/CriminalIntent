@@ -12,7 +12,7 @@ Database annotation tells room that this class represents database in the app.
 the entities tells room which entities (models) to use to run/create db.
 versions is used to tell room if you made changes/modifications to entities from previous time.
  */
-@Database(entities = [Crime::class], version = 2)
+@Database(entities = [Crime::class], version = 3)
 @TypeConverters(CrimeTypeConverters::class) /*To tell the room compiler which converters to use*/
 abstract class CrimeDatabase: RoomDatabase(){
 
@@ -29,5 +29,11 @@ abstract class CrimeDatabase: RoomDatabase(){
 val migration_1_2 = object : Migration(1,2){
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL("ALTER TABLE Crime ADD COLUMN suspect TEXT NOT NULL DEFAULT ''")
+    }
+}
+
+val migration_2_3 = object : Migration(2,3){
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE Crime ADD COLUMN requirePolice INTEGER NOT NULL")
     }
 }

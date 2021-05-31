@@ -42,6 +42,7 @@ class CrimeFragment: Fragment() , DatePickerFragment.Callbacks {
     private lateinit var photoView: ImageView
     private lateinit var photoFile: File
     private lateinit var photoUri : Uri
+    private lateinit var require_police : CheckBox
 
     /*
     Hooking the crimedetailviewmodel with crimefragment to use crimeId
@@ -87,6 +88,7 @@ class CrimeFragment: Fragment() , DatePickerFragment.Callbacks {
         suspectButton = view.findViewById(R.id.crime_suspect) as Button
         photoButton = view.findViewById(R.id.crime_camera) as ImageButton
         photoView = view.findViewById(R.id.crime_photo) as ImageView
+        require_police = view.findViewById(R.id.require_police) as CheckBox
 
        /* dateButton.apply {
             text = crime.date.toString()
@@ -166,6 +168,12 @@ class CrimeFragment: Fragment() , DatePickerFragment.Callbacks {
                 crime.isSolved = isChecked
             }
         }
+        require_police.apply{
+            setOnCheckedChangeListener { _, isChecked ->
+                crime.requirePolice = isChecked
+            }
+        }
+
         dateButton.setOnClickListener {
             /* passing the crime date from this fragment to dialog fragment using instance*/
             DatePickerFragment.newInstance(crime.date).apply {

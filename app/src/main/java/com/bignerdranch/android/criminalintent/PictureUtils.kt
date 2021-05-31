@@ -7,7 +7,7 @@ import android.graphics.Point
 
 /*
 creating a file that would read the image taken, and rescale it to fit the view area as bitmap
-image. p. 322
+image. p. 322 (I added a function for deprecation)
  */
 fun getScaledBitmap(path: String, activity: Activity) : Bitmap{
     val size = Point()
@@ -20,7 +20,6 @@ fun getScaledBitmap(path: String, activity: Activity) : Bitmap{
     }
     return getScaledBitmap(path, size.x, size.y)
 }
-
 
 fun getScaledBitmap(path: String, destWidth: Int, destHeight: Int): Bitmap{
     //Read in the dimensions of the image on disk

@@ -33,8 +33,9 @@ class CrimeRepository private constructor(context: Context){
         context.applicationContext,
         CrimeDatabase::class.java,
         DATABASE_NAME
-    ).addMigrations(migration_1_2) //adding migration to db p.294
-        .build()
+    ).addMigrations(migration_1_2)
+     .addMigrations(migration_2_3)//adding migration to db p.294
+     .build()
 
     private val crimeDao = database.crimeDao()
     private val executor = Executors.newSingleThreadExecutor()

@@ -218,8 +218,14 @@ updating the code to take LiveData
     private inner class CrimeAdapter(var crimes: List<Crime>)
         :RecyclerView.Adapter<CrimeHolder>(){
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CrimeHolder {
-            val view = layoutInflater.inflate(R.layout.list_item_crime, parent,false)
-            return CrimeHolder(view) //Crimeholder is for single set of title and date. <---
+            return if (viewType == 1){
+                val view = layoutInflater.inflate(R.layout.list_item_crime2, parent,false)
+                CrimeHolder(view) //Crimeholder is for single set of title and date. <---
+            }else{
+                val view = layoutInflater.inflate(R.layout.list_item_crime, parent,false)
+                CrimeHolder(view) //Crimeholder is for single set of title and date. <---
+            }
+
         }
         override fun getItemCount() = crimes.size
 
@@ -236,6 +242,13 @@ updating the code to take LiveData
 
             holder.bind(crime)
     }
+
+        override fun getItemViewType(position: Int): Int {
+            return when(crimes[position].requirePolice){
+                true -> 1
+                else -> 2
+            }
+        }
 }
 
 
