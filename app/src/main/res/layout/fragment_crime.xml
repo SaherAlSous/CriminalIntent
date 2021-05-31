@@ -63,6 +63,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         tools:text="Wed Nov 14 11:56 EST 2018"/>
+    <Button
+        android:id="@+id/crime_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="12:34 PM"/>
 
     <LinearLayout
         android:layout_width="match_parent"

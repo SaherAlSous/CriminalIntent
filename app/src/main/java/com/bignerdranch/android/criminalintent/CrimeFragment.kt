@@ -1,10 +1,14 @@
 package com.bignerdranch.android.criminalintent
 
+import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.TimePickerDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
+import android.icu.text.SimpleDateFormat
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.provider.MediaStore
@@ -15,12 +19,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.bignerdranch.android.criminalintent.database.CrimeDetailViewModel
 import java.util.*
 import androidx.lifecycle.Observer
+import com.bignerdranch.android.criminalintent.database.CrimeRepository
 import java.io.File
 
 private const val ARG_CRIME_ID = "crime_id"
@@ -42,7 +48,9 @@ class CrimeFragment: Fragment() , DatePickerFragment.Callbacks {
     private lateinit var photoView: ImageView
     private lateinit var photoFile: File
     private lateinit var photoUri : Uri
-    private lateinit var require_police : CheckBox
+    private lateinit var requirePolice : CheckBox
+    private lateinit var crimeTime : Button
+
 
     /*
     Hooking the crimedetailviewmodel with crimefragment to use crimeId
@@ -88,7 +96,8 @@ class CrimeFragment: Fragment() , DatePickerFragment.Callbacks {
         suspectButton = view.findViewById(R.id.crime_suspect) as Button
         photoButton = view.findViewById(R.id.crime_camera) as ImageButton
         photoView = view.findViewById(R.id.crime_photo) as ImageView
-        require_police = view.findViewById(R.id.require_police) as CheckBox
+        requirePolice = view.findViewById(R.id.require_police) as CheckBox
+        crimeTime = view.findViewById(R.id.crime_time) as Button
 
        /* dateButton.apply {
             text = crime.date.toString()
@@ -132,6 +141,8 @@ class CrimeFragment: Fragment() , DatePickerFragment.Callbacks {
         )
     }
 
+    @SuppressLint("SimpleDateFormat")
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun onStart() {
         super.onStart()
         /*
@@ -168,7 +179,7 @@ class CrimeFragment: Fragment() , DatePickerFragment.Callbacks {
                 crime.isSolved = isChecked
             }
         }
-        require_police.apply{
+        requirePolice.apply{
             setOnCheckedChangeListener { _, isChecked ->
                 crime.requirePolice = isChecked
             }
@@ -181,9 +192,25 @@ class CrimeFragment: Fragment() , DatePickerFragment.Callbacks {
                                                                             // a target fragment for
                                                                             //the dialog to get the
                                                                             //picked date by user
-                show(this@CrimeFragment.getParentFragmentManager(), DIALOG_DATE)
+                show(this@CrimeFragment.parentFragmentManager, DIALOG_DATE)
             }
         }
+
+        /**
+         * Adding time Picker
+         */
+        crimeTime.setOnClickListener {
+            val calendar = Calendar.getInstance()
+            val timeListener = TimePickerDialog.OnTimeSetListener { timePicker: TimePicker , hourOfDay, minute ->
+                calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
+                calendar.set(Calendar.MINUTE, minute)
+                crimeTime.text = java.text.SimpleDateFormat("HH:mm").format(calendar.time)
+            }
+            TimePickerDialog(context, timeListener, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), false).show()
+
+        }
+
+
 
         /*
         Creating an implicit intent to send the report as text, with subject and body. p.298+
