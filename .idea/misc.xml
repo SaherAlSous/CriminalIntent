@@ -4,6 +4,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/saher/AndroidStudioProjects/CriminalIntent/app/src/main/res/layout/activity_main.xml" value="0.25416666666666665" />
+        <entry key="..\:/Users/saher/AndroidStudioProjects/CriminalIntent/app/src/main/res/layout/empty_layout.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/saher/AndroidStudioProjects/CriminalIntent/app/src/main/res/layout/fragment_crime.xml" value="0.4" />
         <entry key="..\:/Users/saher/AndroidStudioProjects/CriminalIntent/app/src/main/res/layout/fragment_crime_list.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/saher/AndroidStudioProjects/CriminalIntent/app/src/main/res/layout/list_item_crime.xml" value="0.536" />
@@ -18,5 +19,12 @@
   </component>
   <component name="ProjectType">
     <option name="id" value="Android" />
+  </component>
+  <component name="VisualizationToolProject">
+    <option name="state">
+      <ProjectState>
+        <option name="scale" value="0.25416666666666665" />
+      </ProjectState>
+    </option>
   </component>
 </project>

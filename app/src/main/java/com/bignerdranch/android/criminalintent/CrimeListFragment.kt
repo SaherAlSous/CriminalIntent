@@ -1,21 +1,29 @@
 package com.bignerdranch.android.criminalintent
 
 import android.content.Context
+import android.opengl.Visibility
 import android.os.Bundle
 import android.text.format.DateFormat
 import android.util.Log
 import android.view.*
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bignerdranch.android.criminalintent.database.CrimeRepository
 import java.util.*
 
 
 private const val TAG = "CrimeListFragment"
+private lateinit var crimeRecyclerView : RecyclerView
+
 
 class CrimeListFragment: Fragment() {
 
@@ -29,8 +37,8 @@ class CrimeListFragment: Fragment() {
     }
 
     private var callbacks: Callbacks? = null
+    private lateinit var imageButton : ImageButton
 
-    private lateinit var crimeRecyclerView : RecyclerView
 
     //creating the adapter value that will link the Model with the View
     private var adapter : CrimeAdapter? = CrimeAdapter(emptyList())
@@ -57,7 +65,8 @@ telling fragment manager that crimeListFragment needs to receive menu callbacks
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-    }
+
+  }
 
     //responding to menu items selection based on Item ID. p. 283/4
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -85,12 +94,35 @@ telling fragment manager that crimeListFragment needs to receive menu callbacks
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_crime_list, container, false)
+    ): View {
 
-        crimeRecyclerView =
-            view.findViewById(R.id.crime_recycler_view) as RecyclerView
-        crimeRecyclerView.layoutManager= LinearLayoutManager(context)
+            val view= inflater.inflate(R.layout.fragment_crime_list, container, false)
+              crimeRecyclerView =
+                view?.findViewById(R.id.crime_recycler_view) as RecyclerView
+            crimeRecyclerView.layoutManager= LinearLayoutManager(context)
+
+//            val view : View
+//            val repository = CrimeRepository.get()
+//            val crimes : LiveData<List<Crime>> = repository.getCrimes()
+//
+//
+//            if (crimes.value?.isEmpty() == true){
+//
+//            view= inflater.inflate(R.layout.fragment_crime_list, container, false)
+//              crimeRecyclerView =
+//                view?.findViewById(R.id.crime_recycler_view) as RecyclerView
+//            crimeRecyclerView?.layoutManager= LinearLayoutManager(context)
+//        } else{
+//               view = inflater.inflate(R.layout.empty_layout, container, false)
+//                imageButton = view.findViewById(R.id.imageButton) as ImageButton
+//
+//                imageButton.setOnClickListener{
+//                    val crime = Crime()
+//                    crimeListViewModel.addCrime(crime)
+//                    callbacks?.onCrimeSelected(crime.id)
+//                }
+//        }
+
 
         //linking the data model with the adapter and View
         //updateUI()
@@ -101,8 +133,19 @@ telling fragment manager that crimeListFragment needs to receive menu callbacks
 updating the code to take LiveData
  */
     private fun updateUI(crimes: List<Crime>) {
+    if (crimes.isEmpty()){
+        imageButton = view?.findViewById(R.id.imageButton) as ImageButton
+        imageButton.setVisibility(View.VISIBLE)
+        imageButton.setOnClickListener{
+                    val crime = Crime()
+                    crimeListViewModel.addCrime(crime)
+                    callbacks?.onCrimeSelected(crime.id)
+        }
+    } else{
         adapter = CrimeAdapter(crimes)
         crimeRecyclerView.adapter = adapter
+    }
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
