@@ -20,6 +20,7 @@ import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
@@ -30,6 +31,7 @@ import java.util.*
 import androidx.lifecycle.Observer
 import com.bignerdranch.android.criminalintent.database.CrimeRepository
 import java.io.File
+import kotlin.properties.Delegates
 
 private const val ARG_CRIME_ID = "crime_id"
 private const val DIALOG_DATE = "DialogDate"
@@ -48,13 +50,15 @@ class CrimeFragment: Fragment() , DatePickerFragment.Callbacks {
     private lateinit var reportButton: Button
     private lateinit var suspectButton: Button
     private lateinit var photoButton: ImageButton
-    private lateinit var photoView: ImageView
+    private lateinit var crimePhoto: ImageView
     private lateinit var photoFile: File
     private lateinit var photoUri : Uri
     private lateinit var requirePolice : CheckBox
     private lateinit var crimeTime : Button
     private lateinit var callSuspect : Button
-    private lateinit var crimePhoto : ImageButton
+    private lateinit var treeObserver: ViewTreeObserver
+    private var viewWidth by Delegates.notNull<Int>()
+    private var viewHeight by Delegates.notNull<Int>()
 
 
     /*
@@ -100,11 +104,11 @@ class CrimeFragment: Fragment() , DatePickerFragment.Callbacks {
         reportButton = view.findViewById(R.id.crime_report) as Button
         suspectButton = view.findViewById(R.id.crime_suspect) as Button
         photoButton = view.findViewById(R.id.crime_camera) as ImageButton
-        photoView = view.findViewById(R.id.crime_photo) as ImageView
+        crimePhoto = view.findViewById(R.id.crime_photo) as ImageView
         requirePolice = view.findViewById(R.id.require_police) as CheckBox
         crimeTime = view.findViewById(R.id.crime_time) as Button
         callSuspect = view.findViewById(R.id.call_suspect) as Button
-        crimePhoto = view.findViewById(R.id.crime_photo) as ImageButton
+
 
        /* dateButton.apply {
             text = crime.date.toString()
@@ -112,7 +116,11 @@ class CrimeFragment: Fragment() , DatePickerFragment.Callbacks {
         }
         Using the button to date picker dialog
         */
-
+        treeObserver = crimePhoto.viewTreeObserver
+        treeObserver.addOnGlobalLayoutListener {
+            viewWidth = crimePhoto.width
+            viewHeight = crimePhoto.height
+        }
         return view
     }
 
@@ -312,17 +320,17 @@ creating a camera intent to take photos... p. 320
         if (crime.suspect.isNotBlank()){
             suspectButton.text = crime.suspect
         }
-        updatePhotoView()
+        updatePhotoView(viewWidth,viewHeight)
     }
     /*
     displaying current photo p 324
      */
-    private fun updatePhotoView(){
+    private fun updatePhotoView(width: Int, height: Int){
         if(photoFile.exists()){
             val bitmap = getScaledBitmap(photoFile.path, requireActivity())
-            photoView.setImageBitmap(bitmap)
+            crimePhoto.setImageBitmap(bitmap)
         }else {
-            photoView.setImageDrawable(null)
+            crimePhoto.setImageDrawable(null)
         }
     }
 
@@ -366,7 +374,7 @@ creating a camera intent to take photos... p. 320
             requestCode == REQUEST_PHOTO -> {
                 requireActivity().revokeUriPermission(photoUri,
                 Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-                updatePhotoView()
+                updatePhotoView(viewWidth,viewHeight)
             }
             /**
              * Get the Phone Number
