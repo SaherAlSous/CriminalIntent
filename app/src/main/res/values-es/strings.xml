@@ -22,4 +22,5 @@
     <string name="crimetitle">Título del crimen </string>
     <string name="handcuffs">esposas</string>
     <string name="require_police">"requiere policía"</string>
+    <string name="call_suspect">llamar al sospechoso</string>
 </resources>

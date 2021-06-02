@@ -5,6 +5,8 @@
     <uses-feature android:name="android.hardware.camera"
         android:required="false"/>
 
+    <uses-permission android:name="android.permission.READ_CONTACTS"/>
+
     <!-- We add the CriminialIntentApplication into manifest to create an instance for
      it once the app starts, which will call the onCreate class within file. this will
      initialize CrimeRepository and it can be accessed from other components.-->

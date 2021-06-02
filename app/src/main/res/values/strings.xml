@@ -20,4 +20,5 @@
     <string name="crime_report_subject">Criminal Intent Crime Report</string>
     <string name="send_report">Send crime report via…</string>
     <string name="require_police">Require Police</string>
+    <string name="call_suspect">call Suspect</string>
 </resources>

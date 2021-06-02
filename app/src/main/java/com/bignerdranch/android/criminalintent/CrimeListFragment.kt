@@ -3,6 +3,7 @@ package com.bignerdranch.android.criminalintent
 import android.content.Context
 import android.opengl.Visibility
 import android.os.Bundle
+import android.text.Layout
 import android.text.format.DateFormat
 import android.util.Log
 import android.view.*
@@ -94,45 +95,43 @@ telling fragment manager that crimeListFragment needs to receive menu callbacks
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
+    ): View? {
 
             val view= inflater.inflate(R.layout.fragment_crime_list, container, false)
               crimeRecyclerView =
                 view?.findViewById(R.id.crime_recycler_view) as RecyclerView
             crimeRecyclerView.layoutManager= LinearLayoutManager(context)
 
-//            val view : View
-//            val repository = CrimeRepository.get()
-//            val crimes : LiveData<List<Crime>> = repository.getCrimes()
+
+//            crimeListViewModel.crimeListLiveData.observe(viewLifecycleOwner) { crimes ->
+//                if (crimes.isNullOrEmpty()) {
+//                   val view = inflater.inflate(R.layout.fragment_crime_list, container, false)
+//                    crimeRecyclerView =
+//                        view.findViewById(R.id.crime_recycler_view) as RecyclerView
+//                    crimeRecyclerView.layoutManager = LinearLayoutManager(context)
 //
+//                } else {
+//                    val view = inflater.inflate(R.layout.empty_layout, container, false)
+//                    imageButton = view.findViewById(R.id.imageButton) as ImageButton
 //
-//            if (crimes.value?.isEmpty() == true){
-//
-//            view= inflater.inflate(R.layout.fragment_crime_list, container, false)
-//              crimeRecyclerView =
-//                view?.findViewById(R.id.crime_recycler_view) as RecyclerView
-//            crimeRecyclerView?.layoutManager= LinearLayoutManager(context)
-//        } else{
-//               view = inflater.inflate(R.layout.empty_layout, container, false)
-//                imageButton = view.findViewById(R.id.imageButton) as ImageButton
-//
-//                imageButton.setOnClickListener{
-//                    val crime = Crime()
-//                    crimeListViewModel.addCrime(crime)
-//                    callbacks?.onCrimeSelected(crime.id)
+//                    imageButton.setOnClickListener {
+//                        val crime = Crime()
+//                        crimeListViewModel.addCrime(crime)
+//                        callbacks?.onCrimeSelected(crime.id)
+//                    }
 //                }
-//        }
+//            }
 
-
-        //linking the data model with the adapter and View
-        //updateUI()
-
-        return view
-    }
+return view
+        }
 /*
 updating the code to take LiveData
  */
     private fun updateUI(crimes: List<Crime>) {
+
+//    adapter = CrimeAdapter(crimes)
+//    crimeRecyclerView.adapter = adapter
+//
     if (crimes.isEmpty()){
         imageButton = view?.findViewById(R.id.imageButton) as ImageButton
         imageButton.setVisibility(View.VISIBLE)
@@ -146,7 +145,7 @@ updating the code to take LiveData
         crimeRecyclerView.adapter = adapter
     }
 
-    }
+}
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

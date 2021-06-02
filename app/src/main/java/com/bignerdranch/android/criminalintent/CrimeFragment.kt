@@ -6,6 +6,7 @@ import android.app.TimePickerDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
+import android.database.Cursor
 import android.icu.text.SimpleDateFormat
 import android.net.Uri
 import android.os.Build
@@ -35,6 +36,7 @@ private const val REQUEST_CODE = 0
 private const val Date_Format = "EEE, MMM, dd"
 private const val REQUEST_CONTACT = 1
 private const val REQUEST_PHOTO = 2
+private const val REQUEST_PHONE = 999
 
 class CrimeFragment: Fragment() , DatePickerFragment.Callbacks {
     private lateinit var crime: Crime
@@ -50,6 +52,7 @@ class CrimeFragment: Fragment() , DatePickerFragment.Callbacks {
     private lateinit var photoUri : Uri
     private lateinit var requirePolice : CheckBox
     private lateinit var crimeTime : Button
+    private lateinit var callSuspect : Button
 
 
     /*
@@ -98,6 +101,7 @@ class CrimeFragment: Fragment() , DatePickerFragment.Callbacks {
         photoView = view.findViewById(R.id.crime_photo) as ImageView
         requirePolice = view.findViewById(R.id.require_police) as CheckBox
         crimeTime = view.findViewById(R.id.crime_time) as Button
+        callSuspect = view.findViewById(R.id.call_suspect) as Button
 
        /* dateButton.apply {
             text = crime.date.toString()
@@ -234,6 +238,17 @@ class CrimeFragment: Fragment() , DatePickerFragment.Callbacks {
             setOnClickListener {
                 startActivityForResult(pickContactIntent, REQUEST_CONTACT)
             }
+            /**
+             * Getting contact Phone URI to fetch the number
+             */
+            callSuspect.apply {
+                val pickPhoneIntent = Intent(Intent.ACTION_PICK,ContactsContract.CommonDataKinds.Phone.CONTENT_URI)
+                setOnClickListener {
+                    startActivityForResult(pickPhoneIntent, REQUEST_PHONE)
+                }
+            }
+
+
             /*
      in case there is no contacts app. we let the device(package manager) to bring a list of
      apps that has similar work -> checking for responding activities p. 307
@@ -307,21 +322,21 @@ creating a camera intent to take photos... p. 320
             resultCode != Activity.RESULT_OK -> return
 
             requestCode == REQUEST_CONTACT && data != null -> {
-                val contactURI : Uri? = data.data
+                val contactURI = data.data
                 //Specify which fields you want your query to return values for
                 val queryFields = arrayOf(ContactsContract.Contacts.DISPLAY_NAME)
                 //Perform Your Query - the ContactURI is like a "where" clause here
-                val cursor = contactURI?.let {
+                val cursor =
                     requireActivity().contentResolver
-                        .query(it, queryFields, null, null, null)
-                }
+                        .query(contactURI!!, queryFields, null, null, null)
+
+
 
                 cursor.use {
                     //Verify Cursor contacts at least one result
                     if (it?.count == 0) {
                         return
                     }
-
                     /*
                     Pull out the first column of the first row of data -
                     that is your suspect name.
@@ -339,6 +354,58 @@ creating a camera intent to take photos... p. 320
                 requireActivity().revokeUriPermission(photoUri,
                 Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
                 updatePhotoView()
+            }
+            /**
+             * Get the Phone Number
+             */
+            requestCode == REQUEST_PHONE && data != null -> {
+                val contactURI : Uri? = data.data
+                //Specify which fields you want your query to return values for
+                val queryFields = ContactsContract.CommonDataKinds.Phone._ID
+                //Perform Your Query - the ContactURI is like a "where" clause here
+                val cursor =
+                   requireActivity().contentResolver
+                        .query(contactURI!!, null, queryFields, null, null)
+
+
+//                    val cursorPhone : Cursor? = requireActivity().contentResolver
+//                        .query(
+//                            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+//                            null,
+//                            ContactsContract.CommonDataKinds.Phone._ID,
+//                            null,
+//                            null
+//                        )
+//
+//                cursorPhone.use {
+//                    if (it?.count == 0) {
+//                        println("There is no result")
+//                        return
+//                        }
+//                    it?.moveToFirst()
+//
+//                    val contactNumber = it?.getString(it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
+//                    callSuspect.text=contactNumber
+//                    println("I got $contactNumber")
+//
+//                }
+//                cursorPhone?.close()
+
+
+                   cursor.use {
+                        if (it?.count == 0) {
+                            return
+                        }
+
+                        it?.moveToFirst()
+                        val number = it?.getString(it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
+
+                       val dialNumber = Intent(Intent.ACTION_DIAL)
+                       dialNumber.data = Uri.parse("tel: $number")
+                       startActivity(dialNumber)
+
+                    }
+                cursor?.close()
             }
         }
     }
