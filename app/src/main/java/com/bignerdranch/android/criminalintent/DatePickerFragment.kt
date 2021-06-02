@@ -16,7 +16,7 @@ private const val ARG_DATE = "date"
 class DatePickerFragment: DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val date = arguments?.getSerializable(ARG_DATE) as Date //getting the date from CrimeFragment
-        val calendar = Calendar.getInstance() //creating an instance with the calendar in the library
+        val calendar = Calendar.getInstance(Locale.FRANCE) //creating an instance with the calendar in the library
         calendar.time = date //setting the calendar date from CrimeFragment Argument. if null goes to current date.
 
         val initialYear = calendar.get(Calendar.YEAR) //Initializing calendar with current date

@@ -438,7 +438,8 @@ creating a camera intent to take photos... p. 320
         } else {
             getString(R.string.crime_report_unsolved)
         }
-        val dateString = DateFormat.format(Date_Format, crime.date).toString()
+        val df = DateFormat.getBestDateTimePattern(Locale.FRANCE, Date_Format)
+        val dateString = df.format(Date_Format ,crime.date)
         var suspect = if (crime.suspect.isBlank()){
             getString(R.string.crime_report_no_suspect)
         }else {
