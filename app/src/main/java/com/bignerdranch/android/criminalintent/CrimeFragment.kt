@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.database.Cursor
 import android.icu.text.SimpleDateFormat
+import android.media.Image
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -53,6 +54,7 @@ class CrimeFragment: Fragment() , DatePickerFragment.Callbacks {
     private lateinit var requirePolice : CheckBox
     private lateinit var crimeTime : Button
     private lateinit var callSuspect : Button
+    private lateinit var crimePhoto : ImageButton
 
 
     /*
@@ -102,6 +104,7 @@ class CrimeFragment: Fragment() , DatePickerFragment.Callbacks {
         requirePolice = view.findViewById(R.id.require_police) as CheckBox
         crimeTime = view.findViewById(R.id.crime_time) as Button
         callSuspect = view.findViewById(R.id.call_suspect) as Button
+        crimePhoto = view.findViewById(R.id.crime_photo) as ImageButton
 
        /* dateButton.apply {
             text = crime.date.toString()
@@ -259,6 +262,16 @@ class CrimeFragment: Fragment() , DatePickerFragment.Callbacks {
                     PackageManager.MATCH_DEFAULT_ONLY)
           //  if (resolvedActivity==null) isEnabled = false //<-- IT IS ALWAYS DISABLED.
         }
+
+        /**
+         * creating the imagebutton to start the fragmentdialog and display the photo
+         */
+        crimePhoto.setOnClickListener {
+            val fragment = PhotoDialogFragment(photoFile)
+            fragment.show(childFragmentManager, "PhotoFragmentDialog")
+
+        }
+
 /*
 creating a camera intent to take photos... p. 320
  */
@@ -391,19 +404,16 @@ creating a camera intent to take photos... p. 320
 //                }
 //                cursorPhone?.close()
 
-
                    cursor.use {
                         if (it?.count == 0) {
                             return
                         }
-
                         it?.moveToFirst()
                         val number = it?.getString(it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
 
                        val dialNumber = Intent(Intent.ACTION_DIAL)
                        dialNumber.data = Uri.parse("tel: $number")
                        startActivity(dialNumber)
-
                     }
                 cursor?.close()
             }
